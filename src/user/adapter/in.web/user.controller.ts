@@ -9,9 +9,9 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Delete,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entities/user.entity';
+import { UserService } from '../../application/user.service';
+import { CreateUserDto } from '../../../auth/dto/create-user.dto';
+import { User } from '../../entities/user.entity';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')

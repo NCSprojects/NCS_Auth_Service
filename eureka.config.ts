@@ -1,10 +1,12 @@
 import { Eureka } from 'eureka-js-client';
+import { configDotenv } from 'dotenv';
+configDotenv();
 
 export const eurekaClient = new Eureka({
   // Eureka 서버 URL
   eureka: {
-    host: 'localhost', // Eureka 서버 호스트
-    port: 8673, // Eureka 서버 포트
+    host: process.env.EUREKA_HOST, // Eureka 서버 호스트
+    port: Number(process.env.EUREKA_PORT), // Eureka 서버 포트
     servicePath: '/eureka/apps/', // 서비스 등록 경로
   },
   instance: {

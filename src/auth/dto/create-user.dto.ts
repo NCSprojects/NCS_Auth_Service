@@ -1,5 +1,5 @@
 export class CreateUserDto {
-  id: number;
+  randomId: number;
   preRev: boolean;
   adCnt: number;
   cdCnt: number;

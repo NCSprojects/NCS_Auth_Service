@@ -2,10 +2,10 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
 // 인증 코드 모델 타입
-export type AuthCodeDocument = HydratedDocument<AuthCode>; // HydratedDocument로 변경
+export type AuthCodeDocument = HydratedDocument<AuthCodeEntity>; // HydratedDocument로 변경
 
 @Schema({ collection: 'auth_codes' })
-export class AuthCode {
+export class AuthCodeEntity {
   @Prop({ required: true })
   randomId: number; // 사용자 고유 ID
   @Prop({ required: true, default: Date.now })
@@ -13,4 +13,4 @@ export class AuthCode {
 }
 
 // Mongoose 스키마 생성
-export const AuthCodeSchema = SchemaFactory.createForClass(AuthCode);
+export const AuthCodeSchema = SchemaFactory.createForClass(AuthCodeEntity);
