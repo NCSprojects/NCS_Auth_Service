@@ -1,12 +1,21 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
-import { AuthCodeRepository } from './auth.repository';
+
 import { MongooseModule } from '@nestjs/mongoose';
-import { AuthCode, AuthCodeSchema } from './schema/auth-code.schema';
-import { RedisRepository } from './auth.redis.repository';
+import { AuthCodeEntity, AuthCodeSchema } from './schema/auth-code.schema';
+
+import { AuthMapper } from './mapper/auth.mapper';
+import { AuthAuthCodePersistenceAdapter } from './adapter/out.persistence/auth.authCodePersistenceAdapter';
+import { AuthController } from './adapter/in.web/auth.controller';
+import { AuthService } from './application/auth.service';
+import { AuthCodeRepository } from './adapter/out.persistence/auth.repository';
+import { RedisRepository } from './adapter/out.persistence/auth.redis.repository';
+import { AuthAuthInfoAdapter } from './adapter/out.persistence/auth.authInfoAdapter';
+import { AuthUserServiceAdapter } from './adapter/out.external/auth.UserServiceAdapter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -15,12 +24,34 @@ import { RedisRepository } from './auth.redis.repository';
       signOptions: { expiresIn: '5m' }, // JWT의 만료 시간 설정
     }),
     MongooseModule.forFeature([
-      { name: AuthCode.name, schema: AuthCodeSchema },
+      { name: AuthCodeEntity.name, schema: AuthCodeSchema },
     ]),
     UserModule,
+    ClientsModule.register([
+      {
+        name: 'USER_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'user',
+          protoPath: join(__dirname, '..', 'proto', 'user.proto'),
+          url: 'localhost:50053',
+        },
+      },
+    ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthCodeRepository, RedisRepository],
-  exports: [AuthService],
+  providers: [
+    {
+      provide: 'RegisterUsecase',
+      useClass: AuthService,
+    },
+    AuthCodeRepository,
+    RedisRepository,
+    AuthMapper,
+    AuthAuthCodePersistenceAdapter,
+    AuthAuthInfoAdapter,
+    AuthUserServiceAdapter,
+  ],
+  // exports: [AuthService],
 })
 export class AuthModule {}
