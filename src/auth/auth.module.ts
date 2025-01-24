@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from '../user/user.module';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthCodeEntity, AuthCodeSchema } from './schema/auth-code.schema';
@@ -26,7 +25,6 @@ import { join } from 'path';
     MongooseModule.forFeature([
       { name: AuthCodeEntity.name, schema: AuthCodeSchema },
     ]),
-    UserModule,
     ClientsModule.register([
       {
         name: 'USER_PACKAGE',
