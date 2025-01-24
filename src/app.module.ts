@@ -1,8 +1,5 @@
 import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { typeORMConfig } from '../typeorm.config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { eurekaClient } from '../eureka.config';
@@ -15,8 +12,6 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
       envFilePath: '.env',
     }),
     AuthModule,
-    UserModule,
-    TypeOrmModule.forRoot(typeORMConfig),
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/ncs'),
     RedisModule.forRoot({
       readyLog: true,
