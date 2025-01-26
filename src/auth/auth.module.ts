@@ -19,7 +19,7 @@ import { join } from 'path';
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'YTRmZWFjYWNmYjFkY2FkZWYxY2RkYmFkY2FkZmQwZjM0Zjd', // JWT를 서명할 비밀키 test key
+      secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '5m' }, // JWT의 만료 시간 설정
     }),
     MongooseModule.forFeature([
@@ -32,7 +32,7 @@ import { join } from 'path';
         options: {
           package: 'user',
           protoPath: join(__dirname, '..', 'proto', 'user.proto'),
-          url: 'localhost:50053',
+          url: process.env.GRPC_URL,
         },
       },
     ]),

@@ -12,12 +12,12 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
       envFilePath: '.env',
     }),
     AuthModule,
-    MongooseModule.forRoot('mongodb://127.0.0.1:27017/ncs'),
+    MongooseModule.forRoot(process.env.MONGODB_HOST),
     RedisModule.forRoot({
       readyLog: true,
       config: {
-        host: 'localhost',
-        port: 6380,
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
       },
     }),
   ],
@@ -38,6 +38,5 @@ export class AppModule implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy() {
     eurekaClient.stop();
-    console.log('Eureka Client deregistered successfully');
   }
 }
