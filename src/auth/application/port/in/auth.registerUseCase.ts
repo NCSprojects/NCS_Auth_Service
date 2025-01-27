@@ -9,6 +9,7 @@ export interface RegisterUsecase {
     randomId: number,
   ): Promise<{ accessToken: string; refreshToken: string }>;
   validateAuth(jwtToken: string): Promise<{ valid: boolean; id?: number }>;
+  validateRefreshToken(refreshToken: string);
   createUser(userDto: UserInterface);
   findUserById(randomId: FindUserInterface);
 }

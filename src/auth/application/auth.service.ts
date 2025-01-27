@@ -20,8 +20,8 @@ export class AuthService implements RegisterUsecase {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly jwtService: JwtService,
-    private readonly AuthAuthCodePersistenceAdapter: AuthAuthCodePersistenceAdapter,
-    private readonly AuthAuthInfoAdapter: AuthAuthInfoAdapter,
+    private readonly authAuthCodePersistenceAdapter: AuthAuthCodePersistenceAdapter,
+    private readonly authAuthInfoAdapter: AuthAuthInfoAdapter,
     private readonly authMapper: AuthMapper,
     private readonly authUserServiceAdapter: AuthUserServiceAdapter,
   ) {}
@@ -40,7 +40,7 @@ export class AuthService implements RegisterUsecase {
 
     const createRandomNumDto = this.authMapper.toDtoFromDomain(authCode);
 
-    this.AuthAuthCodePersistenceAdapter.createAuthCode(
+    this.authAuthCodePersistenceAdapter.createAuthCode(
       createRandomNumDto.code,
       createRandomNumDto.createdAt,
     );
@@ -64,7 +64,7 @@ export class AuthService implements RegisterUsecase {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = await this.generateJwt(randomId);
     const refreshToken = await this.generateRefreshToken(randomId);
-    this.AuthAuthInfoAdapter.setExInfo(refreshToken, randomId.toString(), 120);
+    this.authAuthInfoAdapter.setExInfo(refreshToken, randomId.toString(), 120);
     return { accessToken, refreshToken };
   }
   async validateAuth(
@@ -85,7 +85,7 @@ export class AuthService implements RegisterUsecase {
   async verifyAuthCode(randomId: number): Promise<boolean> {
     this.logger.log(`Starting verification for randomId: ${randomId}`);
     const authCodes =
-      await this.AuthAuthCodePersistenceAdapter.findAuthCodeByRandomId(
+      await this.authAuthCodePersistenceAdapter.findAuthCodeByRandomId(
         randomId,
       );
 
@@ -98,5 +98,18 @@ export class AuthService implements RegisterUsecase {
     const authCodeEntity = authCodes[0];
     const authCode = this.authMapper.toDomainFromEntity(authCodeEntity);
     return authCode.isCodeValid(authCode); // 유효성 검사
+  }
+
+  async validateRefreshToken(
+    refreshToken: string,
+  ): Promise<{ valid: boolean; id?: number }> {
+    const result = await this.authAuthInfoAdapter.getInfo(refreshToken);
+    /*token이 있으면 true 아니면 false*/
+    if (result) {
+      // token이 있으면 { valid: true, id: result.id } 반환
+      return { valid: true, id: parseInt(result) };
+    }
+    // token이 없으면 { valid: false } 반환
+    return { valid: false };
   }
 }

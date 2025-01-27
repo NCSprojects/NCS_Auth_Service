@@ -20,4 +20,7 @@ export class RedisRepository {
   async setEx(key: string, value: string, expiry: number) {
     return this.redisClient.set(key, value, 'EX', expiry);
   }
+  async delete(key: string): Promise<number> {
+    return this.redisClient.del(key);
+  }
 }

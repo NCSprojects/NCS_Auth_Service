@@ -44,11 +44,23 @@ export class AuthController {
         randomId: chkVal.id,
       });
       //사용자가 존재하면 true, 없으면 false 반환
-      return chkUser ? true : false;
+      return !!chkUser;
     }
     // 토큰이 유효하지 않으면 false 반환
     return false;
   }
-
-  // @Post('reissue')
+  // AT 및 RT 재발급
+  @Post('reissue')
+  async reissueAccessToken(@Body('refreshToken') token: string) {
+    // JWT 토큰 검증
+    const chkVal: { valid: boolean; id?: number } =
+      await this.registerUsecase.validateRefreshToken(token);
+    if (chkVal.valid) {
+      // id 값으로 사용자 조회
+      const chkUser: UserInterface = await this.registerUsecase.findUserById({
+        randomId: chkVal.id,
+      });
+      return this.registerUsecase.generateAuth(chkUser.randomId);
+    }
+  }
 }
