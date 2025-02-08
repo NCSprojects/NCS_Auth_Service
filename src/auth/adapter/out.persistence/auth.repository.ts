@@ -18,10 +18,18 @@ export class AuthCodeRepository {
   async createAuthCode(
     randomId: number,
     createdAt: Date,
+    visitors: number,
+    guardians: number,
+    isReserved: boolean,
+    observationTime: Date,
   ): Promise<AuthCodeDocument> {
     const createdAuthCode = new this.authCodeModel({
       randomId,
       createdAt: createdAt, // 생성 시간을 기본값으로 설정
+      preRev: isReserved,
+      adCnt: guardians,
+      cdCnt: visitors,
+      scheduleTime: observationTime,
     });
 
     return createdAuthCode.save(); // 저장된 인증 코드 반환

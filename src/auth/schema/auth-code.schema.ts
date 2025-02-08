@@ -10,6 +10,14 @@ export class AuthCodeEntity {
   randomId: number; // 사용자 고유 ID
   @Prop({ required: true, default: Date.now })
   createdAt: Date; // 인증 코드 발급 시간
+  @Prop({ required: true })
+  preRev: boolean;
+  @Prop({ required: true, default: 0 })
+  adCnt: number;
+  @Prop({ required: true, default: 0 })
+  cdCnt: number;
+  @Prop({ required: false })
+  scheduleTime: Date;
 }
 
 // Mongoose 스키마 생성

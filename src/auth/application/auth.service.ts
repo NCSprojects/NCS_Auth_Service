@@ -9,6 +9,9 @@ import { AuthAuthInfoAdapter } from '../adapter/out.persistence/auth.authInfoAda
 import { AuthUserServiceAdapter } from '../adapter/out.external/auth.UserServiceAdapter';
 import { UserInterface } from '../domain/interface/userInterface';
 import { FindUserInterface } from '../domain/interface/findUserInterface';
+import { CreateRandomNumRequestDto } from '../dto/create-random-num-request-dto';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { ChkNumDto } from '../dto/chk-num-dto';
 
 /*
  *
@@ -34,7 +37,9 @@ export class AuthService implements RegisterUsecase {
   }
 
   // 랜덤 코드 생성 함수
-  generateRandomCode(): CreateRandomNumDto {
+  generateRandomCode(
+    requestDto: CreateRandomNumRequestDto,
+  ): CreateRandomNumDto {
     const authCode: AuthCode = new AuthCode();
     authCode.generateRandomCode();
 
@@ -43,6 +48,10 @@ export class AuthService implements RegisterUsecase {
     this.authAuthCodePersistenceAdapter.createAuthCode(
       createRandomNumDto.code,
       createRandomNumDto.createdAt,
+      requestDto.guardians,
+      requestDto.visitors,
+      requestDto.isReserved,
+      requestDto.observationTime,
     );
     return createRandomNumDto;
   }
@@ -82,7 +91,7 @@ export class AuthService implements RegisterUsecase {
     return { valid: false };
   }
   // 인증 코드 검증
-  async verifyAuthCode(randomId: number): Promise<boolean> {
+  async verifyAuthCode(randomId: number): Promise<ChkNumDto> {
     this.logger.log(`Starting verification for randomId: ${randomId}`);
     const authCodes =
       await this.authAuthCodePersistenceAdapter.findAuthCodeByRandomId(
@@ -91,13 +100,21 @@ export class AuthService implements RegisterUsecase {
 
     if (!authCodes || authCodes.length === 0) {
       this.logger.warn(`No auth codes found for randomId: ${randomId}`);
-      return false; // 인증 코드가 없으면 유효하지 않음
+      return new ChkNumDto(false, new CreateUserDto()); // 인증 코드가 없으면 유효하지 않음
     }
 
     // 배열에서 첫 번째 인증 코드만 검사
     const authCodeEntity = authCodes[0];
     const authCode = this.authMapper.toDomainFromEntity(authCodeEntity);
-    return authCode.isCodeValid(authCode); // 유효성 검사
+    const codeValid = authCode.isCodeValid(authCode); // 유효성 검사
+    const createUserDto = new CreateUserDto(
+      authCodes[0].randomId,
+      authCodes[0].preRev,
+      authCodes[0].adCnt,
+      authCodes[0].cdCnt,
+      authCodes[0].createdAt.toDateString(),
+    );
+    return new ChkNumDto(codeValid, createUserDto);
   }
 
   async validateRefreshToken(

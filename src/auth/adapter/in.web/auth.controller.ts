@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import { RegisterUsecase } from '../../application/port/in/auth.registerUseCase';
 import { CreateRandomNumDto } from '../../dto/create-random-num-dto';
 import { UserInterface } from '../../domain/interface/userInterface';
+import { CreateRandomNumRequestDto } from '../../dto/create-random-num-request-dto';
 
 //rt 재발급 짜기
 @Controller('auth')
@@ -12,20 +13,20 @@ export class AuthController {
   ) {}
 
   // 랜덤 6자리 숫자 생성
-  @Get('generate')
-  async generateRandom6Digit(): Promise<CreateRandomNumDto> {
-    return this.registerUsecase.generateRandomCode();
+  @Post('code')
+  async generateRandom6Digit(
+    @Body() createRandomNumRequest: CreateRandomNumRequestDto,
+  ): Promise<CreateRandomNumDto> {
+    return this.registerUsecase.generateRandomCode(createRandomNumRequest);
   }
 
-  @Post('register')
-  async register(@Body() createUserDto: UserInterface): Promise<any> {
-    const chkVal: boolean = await this.registerUsecase.verifyAuthCode(
-      createUserDto.randomId,
-    );
-    if (chkVal) {
-      const newVar = await this.registerUsecase.createUser(createUserDto);
+  @Post('verify')
+  async register(@Body('randomId') randomId: number): Promise<any> {
+    const verifyValue = await this.registerUsecase.verifyAuthCode(randomId);
+    if (verifyValue.chkval) {
+      const newVar = await this.registerUsecase.createUser(verifyValue.dto);
       console.log(newVar);
-      return this.registerUsecase.generateAuth(createUserDto.randomId);
+      return this.registerUsecase.generateAuth(randomId);
     } else {
       return {
         message: 'Invalid verification code',

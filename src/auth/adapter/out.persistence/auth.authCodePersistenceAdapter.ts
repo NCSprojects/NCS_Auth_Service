@@ -11,8 +11,19 @@ export class AuthAuthCodePersistenceAdapter
   async createAuthCode(
     randomId: number,
     createdAt: Date,
+    visitors: number,
+    guardians: number,
+    isReserved: boolean,
+    observationTime: Date,
   ): Promise<AuthCodeDocument> {
-    return this.authCodeRepository.createAuthCode(randomId, createdAt);
+    return this.authCodeRepository.createAuthCode(
+      randomId,
+      createdAt,
+      visitors,
+      guardians,
+      isReserved,
+      observationTime,
+    );
   }
   async findAuthCodeByRandomId(randomId: number): Promise<AuthCodeDocument[]> {
     return await this.authCodeRepository.findAuthCodeByRandomId(randomId);
