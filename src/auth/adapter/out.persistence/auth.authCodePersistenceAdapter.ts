@@ -9,7 +9,7 @@ export class AuthAuthCodePersistenceAdapter
 {
   constructor(private readonly authCodeRepository: AuthCodeRepository) {}
   async createAuthCode(
-    randomId: number,
+    randomId: string,
     createdAt: Date,
     visitors: number,
     guardians: number,
@@ -25,17 +25,17 @@ export class AuthAuthCodePersistenceAdapter
       observationTime,
     );
   }
-  async findAuthCodeByRandomId(randomId: number): Promise<AuthCodeDocument[]> {
+  async findAuthCodeByRandomId(randomId: string): Promise<AuthCodeDocument[]> {
     return await this.authCodeRepository.findAuthCodeByRandomId(randomId);
   }
   async findAuthCode(
-    randomId: number,
+    randomId: string,
     createdAt: Date,
   ): Promise<AuthCodeDocument | null> {
     return await this.authCodeRepository.findAuthCode(randomId, createdAt);
   }
 
-  async deleteAuthCode(randomId: number, createdAt: Date): Promise<boolean> {
+  async deleteAuthCode(randomId: string, createdAt: Date): Promise<boolean> {
     return await this.authCodeRepository.deleteAuthCode(randomId, createdAt);
   }
 }

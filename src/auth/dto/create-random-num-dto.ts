@@ -1,4 +1,4 @@
 export class CreateRandomNumDto {
-  code: number;
+  code: string;
   createdAt: Date;
 }

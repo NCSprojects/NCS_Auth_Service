@@ -1,5 +1,5 @@
 export interface UserInterface {
-  randomId: number;
+  randomId: string;
   preRev: boolean;
   adCnt: number;
   cdCnt: number;

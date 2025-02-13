@@ -1,3 +1,3 @@
 export interface FindUserInterface {
-  randomId: number;
+  randomId: string;
 }

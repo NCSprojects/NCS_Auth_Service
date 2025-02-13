@@ -8,11 +8,11 @@ export interface RegisterUsecase {
   generateRandomCode(
     createRequestDto: CreateRandomNumRequestDto,
   ): CreateRandomNumDto;
-  verifyAuthCode(randomId: number): Promise<ChkNumDto>;
+  verifyAuthCode(randomId: string): Promise<ChkNumDto>;
   generateAuth(
-    randomId: number,
+    randomId: string,
   ): Promise<{ accessToken: string; refreshToken: string }>;
-  validateAuth(jwtToken: string): Promise<{ valid: boolean; id?: number }>;
+  validateAuth(jwtToken: string): Promise<{ valid: boolean; id?: string }>;
   validateRefreshToken(refreshToken: string);
   createUser(userDto: UserInterface);
   findUserById(randomId: FindUserInterface);

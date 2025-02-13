@@ -16,7 +16,7 @@ export class AuthCodeRepository {
 
   // 인증 코드 생성
   async createAuthCode(
-    randomId: number,
+    randomId: string,
     createdAt: Date,
     visitors: number,
     guardians: number,
@@ -36,20 +36,20 @@ export class AuthCodeRepository {
   }
 
   // 인증 코드 찾기 (randomId로만 찾기)
-  async findAuthCodeByRandomId(randomId: number): Promise<AuthCodeDocument[]> {
+  async findAuthCodeByRandomId(randomId: string): Promise<AuthCodeDocument[]> {
     return this.authCodeModel.find({ randomId }).exec();
   }
 
   // 인증 코드 찾기 (randomId와 createdAt으로 찾기)
   async findAuthCode(
-    randomId: number,
+    randomId: string,
     createdAt: Date,
   ): Promise<AuthCodeDocument | null> {
     return this.authCodeModel.findOne({ randomId, createdAt }).exec();
   }
 
   // 인증 코드 삭제
-  async deleteAuthCode(randomId: number, createdAt: Date): Promise<boolean> {
+  async deleteAuthCode(randomId: string, createdAt: Date): Promise<boolean> {
     const result = await this.authCodeModel
       .deleteOne({ randomId, createdAt })
       .exec();

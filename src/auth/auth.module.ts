@@ -15,6 +15,7 @@ import { AuthAuthInfoAdapter } from './adapter/out.persistence/auth.authInfoAdap
 import { AuthUserServiceAdapter } from './adapter/out.external/auth.UserServiceAdapter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { join } from 'path';
       },
     ]),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, AuthGrpcController],
   providers: [
     {
       provide: 'RegisterUsecase',
@@ -46,8 +47,22 @@ import { join } from 'path';
     AuthCodeRepository,
     RedisRepository,
     AuthMapper,
-    AuthAuthCodePersistenceAdapter,
-    AuthAuthInfoAdapter,
+    {
+      provide: 'AuthLoadAuth',
+      useClass: AuthAuthCodePersistenceAdapter,
+    },
+    {
+      provide: 'AuthSaveAuth',
+      useClass: AuthAuthCodePersistenceAdapter,
+    },
+    {
+      provide: 'AuthLoadAuthInfo',
+      useClass: AuthAuthInfoAdapter,
+    },
+    {
+      provide: 'AuthSaveAuthInfo',
+      useClass: AuthAuthInfoAdapter,
+    },
     AuthUserServiceAdapter,
   ],
   // exports: [AuthService],

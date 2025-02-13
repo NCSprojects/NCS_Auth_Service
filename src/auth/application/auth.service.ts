@@ -1,17 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUsecase } from './port/in/auth.registerUseCase';
 import { CreateRandomNumDto } from '../dto/create-random-num-dto';
 import { AuthCode } from '../domain/auth';
 import { AuthMapper } from '../mapper/auth.mapper';
-import { AuthAuthCodePersistenceAdapter } from '../adapter/out.persistence/auth.authCodePersistenceAdapter';
-import { AuthAuthInfoAdapter } from '../adapter/out.persistence/auth.authInfoAdapter';
 import { AuthUserServiceAdapter } from '../adapter/out.external/auth.UserServiceAdapter';
 import { UserInterface } from '../domain/interface/userInterface';
 import { FindUserInterface } from '../domain/interface/findUserInterface';
 import { CreateRandomNumRequestDto } from '../dto/create-random-num-request-dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { ChkNumDto } from '../dto/chk-num-dto';
+import { AuthLoadAuthInfo } from './port/out/auth.loadAuthInfo';
+import { AuthSaveAuthInfo } from './port/out/auth.saveAuthInfo';
+import { AuthSaveAuth } from './port/out/auth.saveAuth';
+import { AuthLoadAuth } from './port/out/auth.loadAuth';
 
 /*
  *
@@ -23,8 +25,12 @@ export class AuthService implements RegisterUsecase {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly jwtService: JwtService,
-    private readonly authAuthCodePersistenceAdapter: AuthAuthCodePersistenceAdapter,
-    private readonly authAuthInfoAdapter: AuthAuthInfoAdapter,
+    @Inject('AuthLoadAuth') private readonly authLoadAuth: AuthLoadAuth,
+    @Inject('AuthSaveAuth') private readonly authSaveAuth: AuthSaveAuth,
+    @Inject('AuthLoadAuthInfo')
+    private readonly authAuthInfoAdapter: AuthLoadAuthInfo,
+    @Inject('AuthSaveAuthInfo')
+    private readonly authSaveAuthInfoAdapter: AuthSaveAuthInfo,
     private readonly authMapper: AuthMapper,
     private readonly authUserServiceAdapter: AuthUserServiceAdapter,
   ) {}
@@ -45,7 +51,7 @@ export class AuthService implements RegisterUsecase {
 
     const createRandomNumDto = this.authMapper.toDtoFromDomain(authCode);
 
-    this.authAuthCodePersistenceAdapter.createAuthCode(
+    this.authSaveAuth.createAuthCode(
       createRandomNumDto.code,
       createRandomNumDto.createdAt,
       requestDto.guardians,
@@ -57,28 +63,32 @@ export class AuthService implements RegisterUsecase {
   }
 
   // access token 생성
-  async generateJwt(randomId: number): Promise<string> {
+  async generateJwt(randomId: string): Promise<string> {
     const payload = { randomId };
     return this.jwtService.signAsync(payload, { expiresIn: '5m' }); // access token, 5분 동안 유효
   }
 
   // refresh token 생성
-  async generateRefreshToken(randomId: number): Promise<string> {
+  async generateRefreshToken(randomId: string): Promise<string> {
     const payload = { randomId };
     return this.jwtService.signAsync(payload, { expiresIn: '7d' }); // refresh token, 7일 동안 유효
   }
   // access token과 refresh token을 함께 반환
   async generateAuth(
-    randomId: number,
+    randomId: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = await this.generateJwt(randomId);
     const refreshToken = await this.generateRefreshToken(randomId);
-    this.authAuthInfoAdapter.setExInfo(refreshToken, randomId.toString(), 120);
+    this.authSaveAuthInfoAdapter.setExInfo(
+      refreshToken,
+      randomId.toString(),
+      3600,
+    );
     return { accessToken, refreshToken };
   }
   async validateAuth(
     jwtToken: string,
-  ): Promise<{ valid: boolean; id?: number }> {
+  ): Promise<{ valid: boolean; id?: string }> {
     try {
       // JWT 검증
       const decoded = await this.jwtService.verifyAsync(jwtToken);
@@ -91,12 +101,9 @@ export class AuthService implements RegisterUsecase {
     return { valid: false };
   }
   // 인증 코드 검증
-  async verifyAuthCode(randomId: number): Promise<ChkNumDto> {
+  async verifyAuthCode(randomId: string): Promise<ChkNumDto> {
     this.logger.log(`Starting verification for randomId: ${randomId}`);
-    const authCodes =
-      await this.authAuthCodePersistenceAdapter.findAuthCodeByRandomId(
-        randomId,
-      );
+    const authCodes = await this.authLoadAuth.findAuthCodeByRandomId(randomId);
 
     if (!authCodes || authCodes.length === 0) {
       this.logger.warn(`No auth codes found for randomId: ${randomId}`);
@@ -114,17 +121,19 @@ export class AuthService implements RegisterUsecase {
       authCodes[0].cdCnt,
       authCodes[0].createdAt.toDateString(),
     );
-    return new ChkNumDto(codeValid, createUserDto);
+    return authCodes[0].preRev == true
+      ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleTime)
+      : new ChkNumDto(codeValid, createUserDto);
   }
 
   async validateRefreshToken(
     refreshToken: string,
-  ): Promise<{ valid: boolean; id?: number }> {
+  ): Promise<{ valid: boolean; id?: string }> {
     const result = await this.authAuthInfoAdapter.getInfo(refreshToken);
     /*token이 있으면 true 아니면 false*/
     if (result) {
       // token이 있으면 { valid: true, id: result.id } 반환
-      return { valid: true, id: parseInt(result) };
+      return { valid: true, id: result };
     }
     // token이 없으면 { valid: false } 반환
     return { valid: false };

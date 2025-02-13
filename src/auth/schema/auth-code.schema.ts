@@ -7,7 +7,7 @@ export type AuthCodeDocument = HydratedDocument<AuthCodeEntity>; // HydratedDocu
 @Schema({ collection: 'auth_codes' })
 export class AuthCodeEntity {
   @Prop({ required: true })
-  randomId: number; // 사용자 고유 ID
+  randomId: string; // 사용자 고유 ID
   @Prop({ required: true, default: Date.now })
   createdAt: Date; // 인증 코드 발급 시간
   @Prop({ required: true })
