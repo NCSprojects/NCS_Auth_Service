@@ -3,6 +3,7 @@ import { UserInterface } from '../../../domain/interface/userInterface';
 import { FindUserInterface } from '../../../domain/interface/findUserInterface';
 import { CreateRandomNumRequestDto } from '../../../dto/create-random-num-request-dto';
 import { ChkNumDto } from '../../../dto/chk-num-dto';
+import { CreateReservationRequest } from '../../../domain/interface/resevationInterface';
 //dto로 바꾸기
 export interface RegisterUsecase {
   generateRandomCode(
@@ -16,4 +17,5 @@ export interface RegisterUsecase {
   validateRefreshToken(refreshToken: string);
   createUser(userDto: UserInterface);
   findUserById(randomId: FindUserInterface);
+  reservationPreReservation(reservationDto: CreateReservationRequest);
 }

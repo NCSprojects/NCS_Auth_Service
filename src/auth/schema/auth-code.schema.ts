@@ -17,7 +17,7 @@ export class AuthCodeEntity {
   @Prop({ required: true, default: 0 })
   cdCnt: number;
   @Prop({ required: false })
-  scheduleTime: Date;
+  scheduleId: number;
 }
 
 // Mongoose 스키마 생성

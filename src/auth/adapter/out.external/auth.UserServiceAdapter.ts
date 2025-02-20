@@ -19,21 +19,22 @@ export class AuthUserServiceAdapter implements UserPort, OnModuleInit {
     console.log('UserService:', this.userServiceClient); // 로그로 확인
   }
 
-  createUser(user: UserInterface) {
+  async createUser(user: UserInterface) {
     // gRPC 메서드 호출 (Observable 반환)
     const resultUser$: Observable<UserInterface> =
       this.userServiceClient.CreateUser(user);
-
-    // 여기서 subscribe를 호출해야 실제 RPC 요청이 전송됩니다.
-    resultUser$.subscribe({
-      next: (res) => {
-        return res;
-      },
-      error: (err) => {
-        console.log(err);
-      },
-      complete: () => {},
-    });
+    const result = await lastValueFrom(resultUser$);
+    return result;
+    // // 여기서 subscribe를 호출해야 실제 RPC 요청이 전송됩니다.
+    // resultUser$.subscribe({
+    //   next: (res) => {
+    //     return res;
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   },
+    //   complete: () => {},
+    // });
   }
 
   async findById(randomId: FindUserInterface) {

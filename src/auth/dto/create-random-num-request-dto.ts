@@ -1,6 +1,6 @@
 export class CreateRandomNumRequestDto {
   isReserved: boolean;
-  observationTime: Date;
+  scheduleId: number;
   visitors: number;
   guardians: number;
 }

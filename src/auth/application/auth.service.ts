@@ -14,6 +14,8 @@ import { AuthLoadAuthInfo } from './port/out/auth.loadAuthInfo';
 import { AuthSaveAuthInfo } from './port/out/auth.saveAuthInfo';
 import { AuthSaveAuth } from './port/out/auth.saveAuth';
 import { AuthLoadAuth } from './port/out/auth.loadAuth';
+import { AuthReservationAdapter } from '../adapter/out.external/auth.ReservationAdapter';
+import { CreateReservationRequest } from '../domain/interface/resevationInterface';
 
 /*
  *
@@ -33,7 +35,12 @@ export class AuthService implements RegisterUsecase {
     private readonly authSaveAuthInfoAdapter: AuthSaveAuthInfo,
     private readonly authMapper: AuthMapper,
     private readonly authUserServiceAdapter: AuthUserServiceAdapter,
+    private readonly authReservationAdapter: AuthReservationAdapter,
   ) {}
+
+  reservationPreReservation(reservationDto: CreateReservationRequest) {
+    return this.authReservationAdapter.CreateReservation(reservationDto);
+  }
 
   createUser(userDto: UserInterface) {
     return this.authUserServiceAdapter.createUser(userDto);
@@ -57,7 +64,7 @@ export class AuthService implements RegisterUsecase {
       requestDto.guardians,
       requestDto.visitors,
       requestDto.isReserved,
-      requestDto.observationTime,
+      requestDto.scheduleId,
     );
     return createRandomNumDto;
   }
@@ -122,7 +129,7 @@ export class AuthService implements RegisterUsecase {
       authCodes[0].createdAt.toDateString(),
     );
     return authCodes[0].preRev == true
-      ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleTime)
+      ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleId)
       : new ChkNumDto(codeValid, createUserDto);
   }
 

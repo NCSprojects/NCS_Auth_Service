@@ -16,6 +16,7 @@ import { AuthUserServiceAdapter } from './adapter/out.external/auth.UserServiceA
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
+import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationAdapter';
 
 @Module({
   imports: [
@@ -34,6 +35,15 @@ import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
           package: 'user',
           protoPath: join(__dirname, '..', 'proto', 'user.proto'),
           url: process.env.GRPC_URL,
+        },
+      },
+      {
+        name: 'RESERVATION_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'reservation',
+          protoPath: join(__dirname, '..', 'proto', 'reservation.proto'),
+          url: process.env.RESERVATION_GRPC_URL,
         },
       },
     ]),
@@ -64,6 +74,7 @@ import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
       useClass: AuthAuthInfoAdapter,
     },
     AuthUserServiceAdapter,
+    AuthReservationAdapter,
   ],
   // exports: [AuthService],
 })

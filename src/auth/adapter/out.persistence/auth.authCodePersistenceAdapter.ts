@@ -14,7 +14,7 @@ export class AuthAuthCodePersistenceAdapter
     visitors: number,
     guardians: number,
     isReserved: boolean,
-    observationTime: Date,
+    scheduleId: number,
   ): Promise<AuthCodeDocument> {
     return this.authCodeRepository.createAuthCode(
       randomId,
@@ -22,7 +22,7 @@ export class AuthAuthCodePersistenceAdapter
       visitors,
       guardians,
       isReserved,
-      observationTime,
+      scheduleId,
     );
   }
   async findAuthCodeByRandomId(randomId: string): Promise<AuthCodeDocument[]> {

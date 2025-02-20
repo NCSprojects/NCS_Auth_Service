@@ -21,7 +21,7 @@ export class AuthCodeRepository {
     visitors: number,
     guardians: number,
     isReserved: boolean,
-    observationTime: Date,
+    scheduleId: number,
   ): Promise<AuthCodeDocument> {
     const createdAuthCode = new this.authCodeModel({
       randomId,
@@ -29,7 +29,7 @@ export class AuthCodeRepository {
       preRev: isReserved,
       adCnt: guardians,
       cdCnt: visitors,
-      scheduleTime: observationTime,
+      scheduleId: scheduleId,
     });
 
     return createdAuthCode.save(); // 저장된 인증 코드 반환
