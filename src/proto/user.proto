@@ -7,11 +7,11 @@ service UserService {
   rpc FindById(UserId) returns (UserResponse);
 }
 message UserId {
-  int32 randomId =1;
+  string randomId =1;
 }
 
 message UserRequest {
-  int32 randomId = 1;
+  string randomId = 1;
   int32 adCnt = 2;
   int32 cdCnt = 3;
   bool preRev = 4;
@@ -19,7 +19,7 @@ message UserRequest {
 }
 
 message UserResponse {
-  int32 randomId = 1;
+  string randomId = 1;
   int32 adCnt = 2;
   int32 cdCnt = 3;
   bool preRev = 4;

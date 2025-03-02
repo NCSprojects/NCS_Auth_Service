@@ -61,8 +61,8 @@ export class AuthService implements RegisterUsecase {
     this.authSaveAuth.createAuthCode(
       createRandomNumDto.code,
       createRandomNumDto.createdAt,
-      requestDto.guardians,
       requestDto.visitors,
+      requestDto.guardians,
       requestDto.isReserved,
       requestDto.scheduleId,
     );
