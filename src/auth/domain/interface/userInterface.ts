@@ -4,4 +4,5 @@ export interface UserInterface {
   adCnt: number;
   cdCnt: number;
   regDt: string;
+  manuYn: boolean;
 }

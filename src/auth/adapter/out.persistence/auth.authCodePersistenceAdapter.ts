@@ -14,6 +14,7 @@ export class AuthAuthCodePersistenceAdapter
     visitors: number,
     guardians: number,
     isReserved: boolean,
+    isManual: boolean,
     scheduleId: number,
   ): Promise<AuthCodeDocument> {
     return this.authCodeRepository.createAuthCode(
@@ -22,6 +23,7 @@ export class AuthAuthCodePersistenceAdapter
       visitors,
       guardians,
       isReserved,
+      isManual,
       scheduleId,
     );
   }

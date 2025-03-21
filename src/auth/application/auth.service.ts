@@ -64,6 +64,7 @@ export class AuthService implements RegisterUsecase {
       requestDto.visitors,
       requestDto.guardians,
       requestDto.isReserved,
+      requestDto.isManual,
       requestDto.scheduleId,
     );
     return createRandomNumDto;
@@ -124,15 +125,17 @@ export class AuthService implements RegisterUsecase {
     const createUserDto = new CreateUserDto(
       authCodes[0].randomId,
       authCodes[0].preRev,
+      authCodes[0].manuYn,
       authCodes[0].adCnt,
       authCodes[0].cdCnt,
-      authCodes[0].createdAt.toDateString(),
+      authCodes[0].createdAt.toISOString(), // 시 분 초까지
     );
     return authCodes[0].preRev == true
       ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleId)
       : new ChkNumDto(codeValid, createUserDto);
   }
 
+  // refresh token 검증
   async validateRefreshToken(
     refreshToken: string,
   ): Promise<{ valid: boolean; id?: string }> {

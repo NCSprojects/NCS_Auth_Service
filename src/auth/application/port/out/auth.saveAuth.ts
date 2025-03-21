@@ -7,6 +7,7 @@ export interface AuthSaveAuth {
     visitors: number,
     guardians: number,
     isReserved: boolean,
+    isManual: boolean,
     scheduleId: number,
   ): Promise<AuthCodeDocument>;
   deleteAuthCode(randomId: string, createdAt: Date): Promise<boolean>;

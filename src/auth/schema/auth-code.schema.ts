@@ -12,6 +12,8 @@ export class AuthCodeEntity {
   createdAt: Date; // 인증 코드 발급 시간
   @Prop({ required: true })
   preRev: boolean;
+  @Prop({ required: true })
+  manuYn: boolean;
   @Prop({ required: true, default: 0 })
   adCnt: number;
   @Prop({ required: true, default: 0 })

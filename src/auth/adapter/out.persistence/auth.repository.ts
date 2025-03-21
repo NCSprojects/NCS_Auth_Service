@@ -21,12 +21,14 @@ export class AuthCodeRepository {
     visitors: number,
     guardians: number,
     isReserved: boolean,
+    isManual: boolean,
     scheduleId: number,
   ): Promise<AuthCodeDocument> {
     const createdAuthCode = new this.authCodeModel({
       randomId,
       createdAt: createdAt, // 생성 시간을 기본값으로 설정
       preRev: isReserved,
+      manuYn: isManual,
       adCnt: guardians,
       cdCnt: visitors,
       scheduleId: scheduleId,

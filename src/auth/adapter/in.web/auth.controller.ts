@@ -12,7 +12,6 @@ import { UserInterface } from '../../domain/interface/userInterface';
 import { CreateRandomNumRequestDto } from '../../dto/create-random-num-request-dto';
 import { CreatePreReservationDto } from '../../dto/create-pre-reservation-dto';
 
-//rt 재발급 짜기
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -20,7 +19,12 @@ export class AuthController {
     private readonly registerUsecase: RegisterUsecase,
   ) {}
 
-  // 랜덤 6자리 숫자 생성
+  /*
+   * @Body CreateRandomNumRequestDto
+   * @Return CreateRandomNumDto
+   *
+   *  인증번호를 발급 해주는 메소드
+   * */
   @Post('code')
   async generateRandom6Digit(
     @Body() createRandomNumRequest: CreateRandomNumRequestDto,
@@ -28,6 +32,12 @@ export class AuthController {
     return this.registerUsecase.generateRandomCode(createRandomNumRequest);
   }
 
+  /*
+   * @Param randomId
+   * @Return CreateRandomNumDto
+   *
+   *  입력 받은 번호가 올바른 번호인지 확인
+   * */
   @Post('verify')
   async register(@Body('randomId') randomId: string): Promise<any> {
     const verifyValue = await this.registerUsecase.verifyAuthCode(randomId);
@@ -49,6 +59,13 @@ export class AuthController {
       };
     }
   }
+
+  /*
+   * @Body token
+   * @Return CreateRandomNumDto
+   *
+   *  입력 받은 토큰이 유효한 토큰인지 확인 (Body)
+   * */
   @Post('validate/token')
   async validateToken(@Body('token') token: string): Promise<boolean> {
     // JWT 토큰 검증
@@ -67,6 +84,12 @@ export class AuthController {
     return false;
   }
 
+  /*
+   * @Header authorization Baerer Token
+   * @Return CreateRandomNumDto
+   *
+   *  입력 받은 토큰이 유효한 토큰인지 확인 (Header)
+   * */
   @Post('verify/header')
   async verifyTokenFromHeader(@Headers('authorization') authHeader: string) {
     if (!authHeader) {
@@ -86,7 +109,12 @@ export class AuthController {
     return { userId: chkVal.id };
   }
 
-  // AT 및 RT 재발급
+  /*
+   * @Body refreshToken
+   * @Return CreateRandomNumDto
+   *
+   *  refreshToken을 통한 accessToken , RefreshToken 재발급
+   * */
   @Post('reissue')
   async reissueAccessToken(@Body('refreshToken') token: string) {
     // JWT 토큰 검증

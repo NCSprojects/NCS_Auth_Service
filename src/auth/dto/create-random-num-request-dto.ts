@@ -3,4 +3,5 @@ export class CreateRandomNumRequestDto {
   scheduleId: number;
   visitors: number;
   guardians: number;
+  isManual: boolean;
 }
