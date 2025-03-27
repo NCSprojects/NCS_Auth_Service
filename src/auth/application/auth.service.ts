@@ -1,5 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { RegisterUsecase } from './port/in/auth.registerUseCase';
 import { CreateRandomNumDto } from '../dto/create-random-num-dto';
 import { AuthCode } from '../domain/auth';
@@ -16,6 +15,7 @@ import { AuthSaveAuth } from './port/out/auth.saveAuth';
 import { AuthLoadAuth } from './port/out/auth.loadAuth';
 import { AuthReservationAdapter } from '../adapter/out.external/auth.ReservationAdapter';
 import { CreateReservationRequest } from '../domain/interface/resevationInterface';
+import { JwtTokenService } from './token.service';
 
 /*
  *
@@ -26,7 +26,7 @@ import { CreateReservationRequest } from '../domain/interface/resevationInterfac
 export class AuthService implements RegisterUsecase {
   private readonly logger = new Logger(AuthService.name);
   constructor(
-    private readonly jwtService: JwtService,
+    private readonly jwtTokenService: JwtTokenService,
     @Inject('AuthLoadAuth') private readonly authLoadAuth: AuthLoadAuth,
     @Inject('AuthSaveAuth') private readonly authSaveAuth: AuthSaveAuth,
     @Inject('AuthLoadAuthInfo')
@@ -70,23 +70,14 @@ export class AuthService implements RegisterUsecase {
     return createRandomNumDto;
   }
 
-  // access token 생성
-  async generateJwt(randomId: string): Promise<string> {
-    const payload = { randomId };
-    return this.jwtService.signAsync(payload, { expiresIn: '5m' }); // access token, 5분 동안 유효
-  }
-
-  // refresh token 생성
-  async generateRefreshToken(randomId: string): Promise<string> {
-    const payload = { randomId };
-    return this.jwtService.signAsync(payload, { expiresIn: '7d' }); // refresh token, 7일 동안 유효
-  }
-  // access token과 refresh token을 함께 반환
   async generateAuth(
     randomId: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const accessToken = await this.generateJwt(randomId);
-    const refreshToken = await this.generateRefreshToken(randomId);
+    const payload = { randomId };
+
+    const accessToken = await this.jwtTokenService.generateAccessToken(payload);
+    const refreshToken =
+      await this.jwtTokenService.generateRefreshToken(payload);
     this.authSaveAuthInfoAdapter.setExInfo(
       refreshToken,
       randomId.toString(),
@@ -99,7 +90,7 @@ export class AuthService implements RegisterUsecase {
   ): Promise<{ valid: boolean; id?: string }> {
     try {
       // JWT 검증
-      const decoded = await this.jwtService.verifyAsync(jwtToken);
+      const decoded = await this.jwtTokenService.verifyToken(jwtToken);
       if (decoded && decoded.randomId) {
         return { valid: true, id: decoded.randomId };
       }
