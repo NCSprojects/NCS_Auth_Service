@@ -17,6 +17,13 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
 import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationAdapter';
+import { AdminAdapter } from './adapter/out.persistence/admin.adapter';
+import { AuthAdminRepository } from './adapter/out.persistence/auth.admin.repository';
+import { JwtTokenService } from './application/token.service';
+import { AdminController } from './adapter/in.web/admin.controller';
+import { AdminService } from './application/admin.service';
+import { AdminEntity } from './schema/admin.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -47,13 +54,24 @@ import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationA
         },
       },
     ]),
+    TypeOrmModule.forFeature([AdminEntity]),
   ],
-  controllers: [AuthController, AuthGrpcController],
+  controllers: [AuthController, AuthGrpcController, AdminController],
   providers: [
     {
       provide: 'RegisterUsecase',
       useClass: AuthService,
     },
+    {
+      provide: 'AdminRegisterUsecase',
+      useClass: AdminService,
+    },
+    {
+      provide: 'AdminLoginUsecase',
+      useClass: AdminService,
+    },
+    JwtTokenService,
+    AuthAdminRepository,
     AuthCodeRepository,
     RedisRepository,
     AuthMapper,
@@ -72,6 +90,10 @@ import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationA
     {
       provide: 'AuthSaveAuthInfo',
       useClass: AuthAuthInfoAdapter,
+    },
+    {
+      provide: 'AdminPort',
+      useClass: AdminAdapter,
     },
     AuthUserServiceAdapter,
     AuthReservationAdapter,

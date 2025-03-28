@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { eurekaClient } from '../eureka.config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeORMConfig } from '../typeorm.config';
 
 @Module({
   imports: [
@@ -12,6 +14,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
       envFilePath: '.env',
     }),
     AuthModule,
+    TypeOrmModule.forRoot(typeORMConfig),
     MongooseModule.forRoot(process.env.MONGODB_HOST),
     RedisModule.forRoot({
       readyLog: true,

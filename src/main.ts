@@ -3,9 +3,11 @@ import { AppModule } from './app.module';
 import { LoggingInterceptor } from './common/interceptor/LoggingInterceptor';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   // AuthService의 gRPC 서버
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
