@@ -1,5 +1,5 @@
 import { Admin } from '../domain/admin';
-import { AdminEntity } from '../schema/admin.entity';
+import { AdminEntity } from '../entity/admin.entity';
 import { AdminRegisterDto } from '../dto/admin-register.dto';
 
 export class AdminMapper {

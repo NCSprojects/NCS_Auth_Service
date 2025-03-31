@@ -1,11 +1,11 @@
 import { AdminPort } from '../../application/port/out/admin.port';
-import { AdminEntity } from '../../schema/admin.entity';
-import { AuthAdminRepository } from './auth.admin.repository';
+import { AdminEntity } from '../../entity/admin.entity';
+import { AdminRepository } from './admin.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AdminAdapter implements AdminPort {
-  constructor(private readonly adminRepository: AuthAdminRepository) {}
+  constructor(private readonly adminRepository: AdminRepository) {}
 
   async saveAdmin(adminEntity: AdminEntity): Promise<void> {
     await this.adminRepository.save(adminEntity);

@@ -2,7 +2,7 @@ import { AdminRegisterUsecase } from './port/in/admin.register.usecase';
 
 import { AdminPort } from './port/out/admin.port';
 import { AdminMapper } from '../mapper/admin.mapper';
-import { JwtTokenService } from './token.service';
+import { JwtTokenService } from '../../common/token.service';
 import { AdminRegisterDto } from '../dto/admin-register.dto';
 import {
   ConflictException,

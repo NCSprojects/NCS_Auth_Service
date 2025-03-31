@@ -1,9 +1,9 @@
-import { AdminEntity } from '../../schema/admin.entity';
+import { AdminEntity } from '../../entity/admin.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class AuthAdminRepository extends Repository<AdminEntity> {
+export class AdminRepository extends Repository<AdminEntity> {
   constructor(private datasource: DataSource) {
     super(AdminEntity, datasource.createEntityManager());
   }

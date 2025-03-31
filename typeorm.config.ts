@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { configDotenv } from 'dotenv';
-import { AdminEntity } from './src/auth/schema/admin.entity';
+import { AdminEntity } from './src/admin/entity/admin.entity';
 configDotenv();
 
 export const typeORMConfig: TypeOrmModuleOptions = {

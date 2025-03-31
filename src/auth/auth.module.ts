@@ -1,7 +1,4 @@
 import { Module } from '@nestjs/common';
-
-import { JwtModule } from '@nestjs/jwt';
-
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthCodeEntity, AuthCodeSchema } from './schema/auth-code.schema';
 
@@ -17,20 +14,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
 import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationAdapter';
-import { AdminAdapter } from './adapter/out.persistence/admin.adapter';
-import { AuthAdminRepository } from './adapter/out.persistence/auth.admin.repository';
-import { JwtTokenService } from './application/token.service';
-import { AdminController } from './adapter/in.web/admin.controller';
-import { AdminService } from './application/admin.service';
-import { AdminEntity } from './schema/admin.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { CommonModule } from '../common/common.module';
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET_KEY,
-      signOptions: { expiresIn: '5m' }, // JWT의 만료 시간 설정
-    }),
+    CommonModule,
     MongooseModule.forFeature([
       { name: AuthCodeEntity.name, schema: AuthCodeSchema },
     ]),
@@ -54,24 +42,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         },
       },
     ]),
-    TypeOrmModule.forFeature([AdminEntity]),
   ],
-  controllers: [AuthController, AuthGrpcController, AdminController],
+  controllers: [AuthController, AuthGrpcController],
   providers: [
     {
       provide: 'RegisterUsecase',
       useClass: AuthService,
     },
-    {
-      provide: 'AdminRegisterUsecase',
-      useClass: AdminService,
-    },
-    {
-      provide: 'AdminLoginUsecase',
-      useClass: AdminService,
-    },
-    JwtTokenService,
-    AuthAdminRepository,
     AuthCodeRepository,
     RedisRepository,
     AuthMapper,
@@ -90,10 +67,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     {
       provide: 'AuthSaveAuthInfo',
       useClass: AuthAuthInfoAdapter,
-    },
-    {
-      provide: 'AdminPort',
-      useClass: AdminAdapter,
     },
     AuthUserServiceAdapter,
     AuthReservationAdapter,

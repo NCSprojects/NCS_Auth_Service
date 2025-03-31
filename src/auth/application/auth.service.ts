@@ -15,7 +15,7 @@ import { AuthSaveAuth } from './port/out/auth.saveAuth';
 import { AuthLoadAuth } from './port/out/auth.loadAuth';
 import { AuthReservationAdapter } from '../adapter/out.external/auth.ReservationAdapter';
 import { CreateReservationRequest } from '../domain/interface/resevationInterface';
-import { JwtTokenService } from './token.service';
+import { JwtTokenService } from '../../common/token.service';
 
 /*
  *

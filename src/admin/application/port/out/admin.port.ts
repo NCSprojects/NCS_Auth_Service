@@ -1,4 +1,4 @@
-import { AdminEntity } from '../../../schema/admin.entity';
+import { AdminEntity } from '../../../entity/admin.entity';
 
 export interface AdminPort {
   saveAdmin(adminEntity: AdminEntity): void;

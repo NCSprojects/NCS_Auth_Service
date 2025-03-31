@@ -6,6 +6,8 @@ import { eurekaClient } from '../eureka.config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from '../typeorm.config';
+import { AdminModule } from './admin/admin.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { typeORMConfig } from '../typeorm.config';
         port: parseInt(process.env.REDIS_PORT),
       },
     }),
+    AdminModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
