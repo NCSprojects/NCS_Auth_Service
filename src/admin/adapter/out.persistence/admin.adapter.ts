@@ -19,4 +19,12 @@ export class AdminAdapter implements AdminPort {
   async findById(id: string): Promise<AdminEntity> {
     return await this.adminRepository.findById(id);
   }
+
+  async updateLoginInfo(
+    id: string,
+    loginAt: Date,
+    loginIp: string,
+  ): Promise<void> {
+    return await this.adminRepository.updateLoginInfo(id, loginAt, loginIp);
+  }
 }

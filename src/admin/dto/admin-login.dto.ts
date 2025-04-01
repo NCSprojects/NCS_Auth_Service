@@ -7,6 +7,7 @@ export class AdminLoginDto {
   @Expose({ name: 'password' })
   //@MinLength(4)
   private readonly _password: string;
+  ip?: string;
 
   get id(): string {
     return this._id;

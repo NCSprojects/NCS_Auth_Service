@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from '../typeorm.config';
 import { AdminModule } from './admin/admin.module';
 import { CommonModule } from './common/common.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CommonModule } from './common/common.module';
         port: parseInt(process.env.REDIS_PORT),
       },
     }),
+    EventEmitterModule.forRoot(),
     AdminModule,
     CommonModule,
   ],

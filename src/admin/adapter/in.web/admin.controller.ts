@@ -1,8 +1,9 @@
 import { AdminLoginUsecase } from '../../application/port/in/admin.login.usecase';
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Req } from '@nestjs/common';
 import { AdminRegisterUsecase } from '../../application/port/in/admin.register.usecase';
 import { AdminRegisterDto } from '../../dto/admin-register.dto';
 import { AdminLoginDto } from '../../dto/admin-login.dto';
+import { Request as Request } from 'express';
 
 @Controller('admin')
 export class AdminController {
@@ -21,7 +22,10 @@ export class AdminController {
   @Post('login')
   async login(
     @Body() adminLoginDto: AdminLoginDto,
+    @Req() req: Request,
   ): Promise<{ accessToken: string; refreshToken: string }> {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    adminLoginDto.ip = ip?.toString() ?? '';
     return await this.loginUsecase.login(adminLoginDto);
   }
 }

@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { AdminLoginDto } from '../dto/admin-login.dto';
 import { AdminLoginUsecase } from './port/in/admin.login.usecase';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AdminLoginEvent } from '../event/admin.login.event';
 
 @Injectable()
 export class AdminService implements AdminRegisterUsecase, AdminLoginUsecase {
@@ -19,6 +21,7 @@ export class AdminService implements AdminRegisterUsecase, AdminLoginUsecase {
     @Inject('AdminPort')
     private readonly adminPort: AdminPort,
     private readonly jwtTokenService: JwtTokenService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async register(dto: AdminRegisterDto): Promise<void> {
@@ -41,6 +44,11 @@ export class AdminService implements AdminRegisterUsecase, AdminLoginUsecase {
     if (!isValid) {
       throw new UnauthorizedException('비밀번호가 올바르지 않습니다.');
     }
+
+    this.eventEmitter.emit(
+      'admin.logged-in',
+      new AdminLoginEvent(admin.id, dto.ip, new Date()),
+    );
 
     return this.generateAdminTokens(admin.id);
   }
