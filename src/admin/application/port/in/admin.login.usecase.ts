@@ -4,4 +4,6 @@ export interface AdminLoginUsecase {
   login(
     dto: AdminLoginDto,
   ): Promise<{ accessToken: string; refreshToken: string }>;
+
+  existByid(id: string): Promise<boolean>;
 }

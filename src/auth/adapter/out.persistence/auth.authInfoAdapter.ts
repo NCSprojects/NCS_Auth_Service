@@ -1,6 +1,6 @@
 import { AuthLoadAuthInfo } from '../../application/port/out/auth.loadAuthInfo';
 import { AuthSaveAuthInfo } from '../../application/port/out/auth.saveAuthInfo';
-import { RedisRepository } from './auth.redis.repository';
+import { RedisRepository } from '../../../common/redis/redis.repository';
 import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthAuthInfoAdapter implements AuthLoadAuthInfo, AuthSaveAuthInfo {

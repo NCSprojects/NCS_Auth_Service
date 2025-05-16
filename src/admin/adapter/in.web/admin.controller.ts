@@ -16,7 +16,7 @@ export class AdminController {
 
   @Post('')
   async register(@Body() adminRegisterDto: AdminRegisterDto): Promise<any> {
-    return await this.registerUsecase.register(adminRegisterDto);
+    return this.registerUsecase.register(adminRegisterDto);
   }
 
   @Post('login')

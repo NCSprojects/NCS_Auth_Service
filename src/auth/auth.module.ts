@@ -7,7 +7,7 @@ import { AuthAuthCodePersistenceAdapter } from './adapter/out.persistence/auth.a
 import { AuthController } from './adapter/in.web/auth.controller';
 import { AuthService } from './application/auth.service';
 import { AuthCodeRepository } from './adapter/out.persistence/auth.repository';
-import { RedisRepository } from './adapter/out.persistence/auth.redis.repository';
+import { RedisRepository } from '../common/redis/redis.repository';
 import { AuthAuthInfoAdapter } from './adapter/out.persistence/auth.authInfoAdapter';
 import { AuthUserServiceAdapter } from './adapter/out.external/auth.UserServiceAdapter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -15,10 +15,12 @@ import { join } from 'path';
 import { AuthGrpcController } from './adapter/in.web/auth.grpcController';
 import { AuthReservationAdapter } from './adapter/out.external/auth.ReservationAdapter';
 import { CommonModule } from '../common/common.module';
+import { AdminModule } from '../admin/admin.module';
 
 @Module({
   imports: [
     CommonModule,
+    AdminModule,
     MongooseModule.forFeature([
       { name: AuthCodeEntity.name, schema: AuthCodeSchema },
     ]),

@@ -13,7 +13,9 @@ export interface RegisterUsecase {
   generateAuth(
     randomId: string,
   ): Promise<{ accessToken: string; refreshToken: string }>;
-  validateAuth(jwtToken: string): Promise<{ valid: boolean; id?: string }>;
+  validateAuth(
+    jwtToken: string,
+  ): Promise<{ valid: boolean; id?: string; isAdmin?: boolean }>;
   validateRefreshToken(refreshToken: string);
   createUser(userDto: UserInterface);
   findUserById(randomId: FindUserInterface);

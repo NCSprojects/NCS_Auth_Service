@@ -87,12 +87,16 @@ export class AuthService implements RegisterUsecase {
   }
   async validateAuth(
     jwtToken: string,
-  ): Promise<{ valid: boolean; id?: string }> {
+  ): Promise<{ valid: boolean; id?: string; isAdmin?: boolean }> {
     try {
       // JWT 검증
       const decoded = await this.jwtTokenService.verifyToken(jwtToken);
       if (decoded && decoded.randomId) {
-        return { valid: true, id: decoded.randomId };
+        return { valid: true, id: decoded.randomId, isAdmin: false };
+      }
+      // 2025-05-16 추가
+      else if (decoded && decoded.adminId && decoded.role) {
+        return { valid: true, id: decoded.adminId, isAdmin: true };
       }
     } catch {
       return { valid: false };

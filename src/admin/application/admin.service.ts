@@ -53,6 +53,10 @@ export class AdminService implements AdminRegisterUsecase, AdminLoginUsecase {
     return this.generateAdminTokens(admin.id);
   }
 
+  async existByid(id: string): Promise<boolean> {
+    return this.adminPort.existsById(id);
+  }
+
   private async generateAdminTokens(
     adminId: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {

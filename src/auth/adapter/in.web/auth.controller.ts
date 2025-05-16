@@ -11,12 +11,15 @@ import { CreateRandomNumDto } from '../../dto/create-random-num-dto';
 import { UserInterface } from '../../domain/interface/userInterface';
 import { CreateRandomNumRequestDto } from '../../dto/create-random-num-request-dto';
 import { CreatePreReservationDto } from '../../dto/create-pre-reservation-dto';
+import { AdminLoginUsecase } from '../../../admin/application/port/in/admin.login.usecase';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     @Inject('RegisterUsecase')
     private readonly registerUsecase: RegisterUsecase,
+    @Inject('AdminLoginUsecase')
+    private readonly adminLoginUsecase: AdminLoginUsecase,
   ) {}
 
   /*
@@ -69,16 +72,19 @@ export class AuthController {
   @Post('validate/token')
   async validateToken(@Body('token') token: string): Promise<boolean> {
     // JWT 토큰 검증
-    const chkVal: { valid: boolean; id?: string } =
+    const chkVal: { valid: boolean; id?: string; isAdmin?: boolean } =
       await this.registerUsecase.validateAuth(token);
     // 토큰이 유효한 경우 service로 빼기
-    if (chkVal.valid) {
+    if (chkVal.valid && !chkVal.isAdmin) {
       // id 값으로 사용자 조회
       const chkUser: UserInterface = await this.registerUsecase.findUserById({
         randomId: chkVal.id,
       });
       //사용자가 존재하면 true, 없으면 false 반환
       return !!chkUser;
+    } else if (chkVal.valid && chkVal.isAdmin) {
+      const chkAdmin = await this.adminLoginUsecase.existByid(chkVal.id);
+      return !!chkAdmin;
     }
     // 토큰이 유효하지 않으면 false 반환
     return false;
