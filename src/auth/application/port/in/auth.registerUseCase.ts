@@ -8,7 +8,7 @@ import { CreateReservationRequest } from '../../../domain/interface/resevationIn
 export interface RegisterUsecase {
   generateRandomCode(
     createRequestDto: CreateRandomNumRequestDto,
-  ): CreateRandomNumDto;
+  ): Promise<CreateRandomNumDto>;
   verifyAuthCode(randomId: string): Promise<ChkNumDto>;
   generateAuth(
     randomId: string,

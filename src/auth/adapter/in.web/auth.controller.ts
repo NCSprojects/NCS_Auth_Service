@@ -43,6 +43,7 @@ export class AuthController {
    * */
   @Post('verify')
   async register(@Body('randomId') randomId: string): Promise<any> {
+    let response: Record<string, any>;
     const verifyValue = await this.registerUsecase.verifyAuthCode(randomId);
     if (verifyValue.chkval) {
       const newVar = await this.registerUsecase.createUser(verifyValue.dto);
@@ -55,12 +56,19 @@ export class AuthController {
         );
         this.registerUsecase.reservationPreReservation(newSchedule);
       }
-      return this.registerUsecase.generateAuth(randomId);
+
+      const token = await this.registerUsecase.generateAuth(randomId);
+      response = {
+        ...token,
+        guardians: verifyValue.dto.adCnt,
+        visitors: verifyValue.dto.cdCnt,
+      };
     } else {
-      return {
+      response = {
         message: 'Invalid verification code',
       };
     }
+    return response;
   }
 
   /*

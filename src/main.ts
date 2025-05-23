@@ -4,6 +4,7 @@ import { LoggingInterceptor } from './common/interceptor/LoggingInterceptor';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filters/http-exception/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,6 +20,7 @@ async function bootstrap() {
   });
   await app.startAllMicroservices();
   app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,4 +1,9 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { RegisterUsecase } from './port/in/auth.registerUseCase';
 import { CreateRandomNumDto } from '../dto/create-random-num-dto';
 import { AuthCode } from '../domain/auth';
@@ -50,15 +55,15 @@ export class AuthService implements RegisterUsecase {
   }
 
   // 랜덤 코드 생성 함수
-  generateRandomCode(
+  async generateRandomCode(
     requestDto: CreateRandomNumRequestDto,
-  ): CreateRandomNumDto {
+  ): Promise<CreateRandomNumDto> {
     const authCode: AuthCode = new AuthCode();
     authCode.generateRandomCode();
 
     const createRandomNumDto = this.authMapper.toDtoFromDomain(authCode);
 
-    this.authSaveAuth.createAuthCode(
+    await this.authSaveAuth.createAuthCode(
       createRandomNumDto.code,
       createRandomNumDto.createdAt,
       requestDto.visitors,
@@ -106,28 +111,34 @@ export class AuthService implements RegisterUsecase {
   // 인증 코드 검증
   async verifyAuthCode(randomId: string): Promise<ChkNumDto> {
     this.logger.log(`Starting verification for randomId: ${randomId}`);
-    const authCodes = await this.authLoadAuth.findAuthCodeByRandomId(randomId);
+    try {
+      const authCodes =
+        await this.authLoadAuth.findAuthCodeByRandomId(randomId);
 
-    if (!authCodes || authCodes.length === 0) {
-      this.logger.warn(`No auth codes found for randomId: ${randomId}`);
-      return new ChkNumDto(false, new CreateUserDto()); // 인증 코드가 없으면 유효하지 않음
+      if (!authCodes || authCodes.length === 0) {
+        this.logger.warn(`No auth codes found for randomId: ${randomId}`);
+        return new ChkNumDto(false, new CreateUserDto()); // 인증 코드가 없으면 유효하지 않음
+      }
+
+      // 배열에서 첫 번째 인증 코드만 검사
+      const authCodeEntity = authCodes[0];
+      const authCode = this.authMapper.toDomainFromEntity(authCodeEntity);
+      const codeValid = authCode.isCodeValid(authCode); // 유효성 검사
+      const createUserDto = new CreateUserDto(
+        authCodes[0].randomId,
+        authCodes[0].preRev,
+        authCodes[0].manuYn,
+        authCodes[0].adCnt,
+        authCodes[0].cdCnt,
+        authCodes[0].createdAt.toISOString(), // 시 분 초까지
+      );
+      return authCodes[0].preRev == true
+        ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleId)
+        : new ChkNumDto(codeValid, createUserDto);
+    } catch (error) {
+      this.logger.error(`verifyAuthCode error: ${error.message}`);
+      throw new InternalServerErrorException('server Error');
     }
-
-    // 배열에서 첫 번째 인증 코드만 검사
-    const authCodeEntity = authCodes[0];
-    const authCode = this.authMapper.toDomainFromEntity(authCodeEntity);
-    const codeValid = authCode.isCodeValid(authCode); // 유효성 검사
-    const createUserDto = new CreateUserDto(
-      authCodes[0].randomId,
-      authCodes[0].preRev,
-      authCodes[0].manuYn,
-      authCodes[0].adCnt,
-      authCodes[0].cdCnt,
-      authCodes[0].createdAt.toISOString(), // 시 분 초까지
-    );
-    return authCodes[0].preRev == true
-      ? new ChkNumDto(codeValid, createUserDto, authCodes[0].scheduleId)
-      : new ChkNumDto(codeValid, createUserDto);
   }
 
   // refresh token 검증
